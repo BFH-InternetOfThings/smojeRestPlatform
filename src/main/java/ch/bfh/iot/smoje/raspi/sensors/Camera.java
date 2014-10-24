@@ -4,7 +4,6 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 
 import javax.imageio.ImageIO;
 
@@ -16,10 +15,10 @@ import ch.bfh.iot.smoje.raspi.common.SensorState;
 public class Camera implements ISensor {
 
 	private SensorState state = SensorState.OK;
-	private final String destDir = "/home/smoje/cam/";
+	private final String destDir = "/home/pi/smoje/cam/";
 	private final String imgName = "temp.jpg";
 	
-	private final String imgCaptureInstr = "/usr/bin/raspistill -o" + destDir+ imgName;
+	private final String imgCaptureInstr = "/usr/bin/raspistill -o " + destDir+ imgName;
 	
     @Override
     public String getId() {
@@ -32,8 +31,7 @@ public class Camera implements ISensor {
     	
         String imageString = null;
         try {
-            URL resource = getClass().getResource("destDir+imgName");
-            BufferedImage image = ImageIO.read(new File(resource.getFile()));
+            BufferedImage image = ImageIO.read(new File(destDir+imgName));
 
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
 
@@ -54,6 +52,16 @@ public class Camera implements ISensor {
     	IrLed ir = new IrLed();
     	ir.start();
     	executeCommand(this.imgCaptureInstr);
+    	
+    	// TODO lants1 evil thing, improve it later 
+    	// maybe raspistill or another solution give a feedback about 
+    	// the state of the image capture process
+    	// do it synchron or check the file state with > ~
+    	try {
+			Thread.sleep(15000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
     	ir.stop();
     }
  
