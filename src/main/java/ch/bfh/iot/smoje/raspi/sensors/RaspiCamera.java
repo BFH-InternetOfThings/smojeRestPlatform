@@ -42,7 +42,7 @@ public class RaspiCamera implements ISensor {
 
             bos.close();
         } catch (IOException e) {
-            e.printStackTrace();
+        	state = SensorState.TEMPORARY_NOK;
         }
 
         return imageString;
