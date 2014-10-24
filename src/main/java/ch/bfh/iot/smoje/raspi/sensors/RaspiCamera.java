@@ -18,7 +18,7 @@ public class RaspiCamera implements ISensor {
 	private final String destDir = "/home/pi/smoje/cam/";
 	private final String imgName = "temp.jpg";
 	
-	private final String imgCaptureInstr = "/usr/bin/raspistill -o " + destDir+ imgName;
+	private final String imgCaptureInstr = "/usr/bin/raspistill -o " + destDir+ imgName + " -t 1";
 	
     @Override
     public String getId() {
@@ -58,7 +58,7 @@ public class RaspiCamera implements ISensor {
     	// the state of the image capture process
     	// do it synchron or check the file state with > ~
     	try {
-			Thread.sleep(15000);
+			Thread.sleep(5000);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
