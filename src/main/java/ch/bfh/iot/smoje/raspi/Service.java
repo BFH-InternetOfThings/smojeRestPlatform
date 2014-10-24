@@ -10,9 +10,11 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
-import ch.bfh.iot.smoje.raspi.sensors.CameraSensor;
+import ch.bfh.iot.smoje.raspi.actors.IActor;
+import ch.bfh.iot.smoje.raspi.actors.IrLed;
+import ch.bfh.iot.smoje.raspi.sensors.Camera;
 import ch.bfh.iot.smoje.raspi.sensors.ISensor;
-import ch.bfh.iot.smoje.raspi.sensors.TemperaturSensor;
+import ch.bfh.iot.smoje.raspi.sensors.Temperatur;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -22,13 +24,36 @@ public class Service {
 	ObjectMapper mapper = new ObjectMapper();
 	
 	static Map<String, ISensor> sensors = new HashMap<String, ISensor>();
+	static Map<String, IActor> actors = new HashMap<String, IActor>();
 	
 	static {
-		CameraSensor cam = new CameraSensor();
-		TemperaturSensor temp = new TemperaturSensor();
+		Camera cam = new Camera();
+		Temperatur temp = new Temperatur();
 		sensors.put(cam.getId(), cam);
 		sensors.put(temp.getId(), temp);
 	}
+	
+	static {
+		IrLed irLed = new IrLed();
+		actors.put(irLed.getId(), irLed);
+	}
+	
+	@GET
+	@Path("/actors")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Set<String> getActors() throws JsonProcessingException {
+		return actors.keySet();
+	}
+
+	@GET
+	@Path("/actors/{id}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public IActor getActorValueById(@PathParam("id")String id) throws JsonProcessingException {
+
+		IActor actor = actors.get(id);
+		return actor;
+	}
+	
 	
 	@GET
 	@Path("/sensors")
@@ -37,7 +62,6 @@ public class Service {
 		
 		
 		return sensors.keySet();
-//		return mapper.writeValueAsString(sensors);
 	}
 
 	@GET
@@ -47,7 +71,5 @@ public class Service {
 		
 		ISensor sensor = sensors.get(id);
 		return sensor;
-//		return mapper.writeValueAsString(s1);
-
 	}
 }

@@ -2,8 +2,12 @@ package ch.bfh.iot.smoje.raspi.sensors;
 
 import java.util.Random;
 
-public class TemperaturSensor implements ISensor {
+import ch.bfh.iot.smoje.raspi.common.SensorState;
 
+public class Temperatur implements ISensor {
+
+	SensorState state = SensorState.OK;
+	
 	@Override
 	public String getId() {
 		return "tempAir";
@@ -20,8 +24,8 @@ public class TemperaturSensor implements ISensor {
 	}
 
 	@Override
-	public String getStatus() {
-		return "OK";
+	public SensorState getStatus() {
+		return state;
 	}
 
 	@Override

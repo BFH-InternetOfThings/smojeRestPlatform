@@ -10,8 +10,17 @@ import javax.imageio.ImageIO;
 
 import org.apache.commons.codec.binary.Base64;
 
-public class CameraSensor implements ISensor {
+import ch.bfh.iot.smoje.raspi.actors.IrLed;
+import ch.bfh.iot.smoje.raspi.common.SensorState;
 
+public class Camera implements ISensor {
+
+	private SensorState state = SensorState.OK;
+	private final String destDir = "/home/smoje/cam/";
+	private final String imgName = "temp.jpg";
+	
+	private final String imgCaptureInstr = "/usr/bin/raspistill -o" + destDir+ imgName;
+	
     @Override
     public String getId() {
         return "camera";
@@ -19,11 +28,11 @@ public class CameraSensor implements ISensor {
 
     @Override
     public String getValue() {
-        // TODO: LED Steuerung http://pi4j.com/usage.html
-
+    	captureImage();
+    	
         String imageString = null;
         try {
-            URL resource = getClass().getResource("/camera/bielersee.jpg");
+            URL resource = getClass().getResource("destDir+imgName");
             BufferedImage image = ImageIO.read(new File(resource.getFile()));
 
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
@@ -40,10 +49,26 @@ public class CameraSensor implements ISensor {
 
         return imageString;
     }
-
+    
+    private void captureImage(){
+    	IrLed ir = new IrLed();
+    	ir.start();
+    	executeCommand(this.imgCaptureInstr);
+    	ir.stop();
+    }
+ 
+	private void executeCommand(String cmd) {
+		Runtime r = Runtime.getRuntime();
+		try {
+			r.exec(cmd);
+		} catch (IOException e) {
+			state = SensorState.NOK;
+		}
+	}
+    
     @Override
-    public String getStatus() {
-        return "OK";
+    public SensorState getStatus() {
+        return state;
     }
 
     @Override

@@ -1,5 +1,7 @@
 package ch.bfh.iot.smoje.raspi.sensors;
 
+import ch.bfh.iot.smoje.raspi.common.SensorState;
+
 public interface ISensor {
 
 	public abstract String getId();
@@ -8,6 +10,6 @@ public interface ISensor {
 	
 	public abstract String getUnit();
 
-	public abstract String getStatus();
+	public abstract SensorState getStatus();
 
 }
