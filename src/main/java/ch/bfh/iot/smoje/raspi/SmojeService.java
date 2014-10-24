@@ -12,7 +12,7 @@ import javax.ws.rs.core.MediaType;
 
 import ch.bfh.iot.smoje.raspi.actors.IActor;
 import ch.bfh.iot.smoje.raspi.actors.IrLed;
-import ch.bfh.iot.smoje.raspi.sensors.Camera;
+import ch.bfh.iot.smoje.raspi.sensors.RaspiCamera;
 import ch.bfh.iot.smoje.raspi.sensors.ISensor;
 import ch.bfh.iot.smoje.raspi.sensors.Temperatur;
 
@@ -20,14 +20,14 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Path("/smoje")
-public class Service {
+public class SmojeService {
 	ObjectMapper mapper = new ObjectMapper();
 	
 	static Map<String, ISensor> sensors = new HashMap<String, ISensor>();
 	static Map<String, IActor> actors = new HashMap<String, IActor>();
 	
 	static {
-		Camera cam = new Camera();
+		RaspiCamera cam = new RaspiCamera();
 		Temperatur temp = new Temperatur();
 		sensors.put(cam.getId(), cam);
 		sensors.put(temp.getId(), temp);
