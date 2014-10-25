@@ -19,7 +19,7 @@ TOMCAT7_GROUP=root
 
 add java opts parameter -Djava.library.path=/home/pi/smoje/lib in the same file
 
-create folder on your raspberry /home/pi/smoje/camera
+create folder on your raspberry /home/pi/smoje/cam
 create folder on your raspberry /home/pi/smoje/lib
 
 put libpi4j.so from the pi4j-core jar into the folder /home/pi/smoje/lib

@@ -12,8 +12,9 @@ import javax.ws.rs.core.MediaType;
 
 import ch.bfh.iot.smoje.raspi.actors.IActor;
 import ch.bfh.iot.smoje.raspi.actors.IrLed;
-import ch.bfh.iot.smoje.raspi.sensors.RaspiCamera;
 import ch.bfh.iot.smoje.raspi.sensors.ISensor;
+import ch.bfh.iot.smoje.raspi.sensors.MockCamera;
+import ch.bfh.iot.smoje.raspi.sensors.RaspiCamera;
 import ch.bfh.iot.smoje.raspi.sensors.Temperatur;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -28,8 +29,11 @@ public class SmojeService {
 	
 	static {
 		RaspiCamera cam = new RaspiCamera();
+	    MockCamera cam2 = new MockCamera();
 		Temperatur temp = new Temperatur();
+		
 		sensors.put(cam.getId(), cam);
+		sensors.put(cam2.getId(), cam2);
 		sensors.put(temp.getId(), temp);
 	}
 	

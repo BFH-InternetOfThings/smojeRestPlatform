@@ -1,11 +1,8 @@
 package ch.bfh.iot.smoje.raspi.sensors;
 
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-
-import javax.imageio.ImageIO;
+import java.nio.file.Files;
 
 import org.apache.commons.codec.binary.Base64;
 
@@ -31,16 +28,12 @@ public class RaspiCamera implements ISensor {
     	
         String imageString = null;
         try {
-            BufferedImage image = ImageIO.read(new File(destDir+imgName));
-
-            ByteArrayOutputStream bos = new ByteArrayOutputStream();
-
-            ImageIO.write(image, "jpg", bos);
-            byte[] imageBytes = bos.toByteArray();
+            
+            File file = new File(destDir+imgName);
+            byte[] imageBytes = Files.readAllBytes(file.toPath());
 
             imageString = Base64.encodeBase64String(imageBytes);
 
-            bos.close();
         } catch (IOException e) {
         	state = SensorState.TEMPORARY_NOK;
         }
