@@ -15,7 +15,7 @@ public class RaspiCamera implements ISensor {
 	private final String destDir = "/home/pi/smoje/cam/";
 	private final String imgName = "temp.jpg";
 	
-	private final String imgCaptureInstr = "/usr/bin/raspistill -o " + destDir+ imgName + " -t 1";
+	private final String imgCaptureInstr = "/usr/bin/raspistill -o " + destDir+ imgName + " -t 1 -q 75";
 	
     @Override
     public String getId() {
