@@ -45,24 +45,15 @@ public class RaspiCamera implements ISensor {
     	IrLed ir = new IrLed();
     	ir.start();
     	executeCommand(this.imgCaptureInstr);
-    	
-    	// TODO lants1 evil thing, improve it later 
-    	// maybe raspistill or another solution give a feedback about 
-    	// the state of the image capture process
-    	// do it synchron or check the file state with > ~
-    	try {
-			Thread.sleep(5000);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
     	ir.stop();
     }
  
 	private void executeCommand(String cmd) {
 		Runtime r = Runtime.getRuntime();
 		try {
-			r.exec(cmd);
-		} catch (IOException e) {
+			Process p = r.exec(cmd);
+			p.waitFor();
+		} catch (IOException | InterruptedException e) {
 			state = SensorState.NOK;
 		}
 	}
