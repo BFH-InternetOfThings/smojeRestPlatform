@@ -4,11 +4,13 @@ smojeRestPlatform
 Build/Install
 --------------
 
+
+
+
+
 mvn clean package
 
-Install generated target/piservice.war to Tomcat/Jetty etc.
 
-configure your tomcat:
 
 The Pi4J library will need root privileges in order to control the GPIO pins bad thing...
 

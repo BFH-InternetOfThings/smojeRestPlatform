@@ -40,8 +40,6 @@ public class MockCamera implements ISensor {
 
         imageString = Base64.encodeBase64String(imageBytes);
 
-        System.out.println(imageString.length());
-
         return imageString;
     }
 
