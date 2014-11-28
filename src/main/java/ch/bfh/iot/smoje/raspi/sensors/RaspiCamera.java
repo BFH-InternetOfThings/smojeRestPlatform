@@ -6,7 +6,6 @@ import java.nio.file.Files;
 
 import org.apache.commons.codec.binary.Base64;
 
-import ch.bfh.iot.smoje.raspi.actors.IrLed;
 import ch.bfh.iot.smoje.raspi.common.SensorState;
 
 public class RaspiCamera implements ISensor {
@@ -42,10 +41,10 @@ public class RaspiCamera implements ISensor {
     }
     
     private void captureImage(){
-    	IrLed ir = new IrLed();
-    	ir.start();
+//    	IrLed ir = new IrLed();
+//    	ir.start();
     	executeCommand(this.imgCaptureInstr);
-    	ir.stop();
+//    	ir.stop();
     }
  
 	private void executeCommand(String cmd) {
