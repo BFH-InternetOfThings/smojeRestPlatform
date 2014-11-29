@@ -6,6 +6,8 @@ import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.glassfish.jersey.server.ServerProperties;
 
+import ch.bfh.iot.smoje.raspi.config.Configuration;
+
 public class SmojeServer {
 	
 	public final static Logger 		logger 				= Logger.getLogger(SmojeServer.class);

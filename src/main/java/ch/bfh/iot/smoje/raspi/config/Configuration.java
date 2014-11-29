@@ -1,4 +1,4 @@
-package ch.bfh.iot.smoje.raspi;
+package ch.bfh.iot.smoje.raspi.config;
 
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -7,6 +7,8 @@ import java.util.Map.Entry;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
+
+import ch.bfh.iot.smoje.raspi.SmojeServer;
 
 /**
  * Configuration of Smoje sensor system
