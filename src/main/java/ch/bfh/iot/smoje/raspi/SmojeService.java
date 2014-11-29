@@ -10,12 +10,11 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
-import ch.bfh.iot.smoje.raspi.actors.IActor;
-import ch.bfh.iot.smoje.raspi.sensors.ISensor;
+import ch.bfh.iot.smoje.raspi.actors.SmojeActor;
+import ch.bfh.iot.smoje.raspi.sensors.ArduinoSensorController;
+import ch.bfh.iot.smoje.raspi.sensors.SmojeSensor;
 import ch.bfh.iot.smoje.raspi.sensors.MockCamera;
 import ch.bfh.iot.smoje.raspi.sensors.RaspiCamera;
-import ch.bfh.iot.smoje.raspi.sensors.Temperatur;
-import ch.bfh.iot.smoje.raspi.sensors.Test;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -24,19 +23,21 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class SmojeService {
     ObjectMapper mapper = new ObjectMapper();
 
-    static Map<String, ISensor> sensors = new HashMap<String, ISensor>();
-    static Map<String, IActor> actors = new HashMap<String, IActor>();
+    static Map<String, SmojeSensor> sensors = new HashMap<String, SmojeSensor>();
+    static Map<String, SmojeActor> actors = new HashMap<String, SmojeActor>();
 
     static {
+    	//Instantiate necessary sensors and controllers
+    	ArduinoSensorController arduController = new ArduinoSensorController();
         RaspiCamera cam = new RaspiCamera();
         MockCamera cam2 = new MockCamera();
-        Temperatur temp = new Temperatur();
-        Test test = new Test();
-
+        
+        //add sensors to list
+    	for(SmojeSensor sensor : arduController.getArduinoSensors()){
+    		sensors.put(sensor.getId(), sensor);
+    	}
         sensors.put(cam.getId(), cam);
         sensors.put(cam2.getId(), cam2);
-        sensors.put(temp.getId(), temp);
-        sensors.put(test.getId(), test);
     }
 
     static {
@@ -52,9 +53,9 @@ public class SmojeService {
     @GET
     @Path("/actors/{id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public IActor getActorValueById(@PathParam("id") String id) throws JsonProcessingException {
+    public SmojeActor getActorValueById(@PathParam("id") String id) throws JsonProcessingException {
 
-        IActor actor = actors.get(id);
+        SmojeActor actor = actors.get(id);
         return actor;
     }
 
@@ -69,9 +70,9 @@ public class SmojeService {
     @GET
     @Path("/sensors/{id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public ISensor getSensorValueById(@PathParam("id") String id) throws JsonProcessingException {
+    public SmojeSensor getSensorValueById(@PathParam("id") String id) throws JsonProcessingException {
 
-        ISensor sensor = sensors.get(id);
+        SmojeSensor sensor = sensors.get(id);
         return sensor;
     }
 }

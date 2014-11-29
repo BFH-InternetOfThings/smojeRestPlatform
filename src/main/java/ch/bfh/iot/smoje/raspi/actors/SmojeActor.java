@@ -1,6 +1,6 @@
 package ch.bfh.iot.smoje.raspi.actors;
 
-public interface IActor {
+public interface SmojeActor {
 
 	public abstract String getId();
 

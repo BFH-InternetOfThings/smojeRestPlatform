@@ -10,7 +10,7 @@ import org.apache.commons.codec.binary.Base64;
 
 import ch.bfh.iot.smoje.raspi.common.SensorState;
 
-public class MockCamera implements ISensor {
+public class MockCamera implements SmojeSensor {
 
     @Override
     public String getId() {
@@ -52,4 +52,9 @@ public class MockCamera implements ISensor {
     public String getUnit() {
         return "Base64 encoded Image";
     }
+
+	@Override
+	public SensorType getSensorType() {
+		return SensorType.CAMERA;
+	}
 }
