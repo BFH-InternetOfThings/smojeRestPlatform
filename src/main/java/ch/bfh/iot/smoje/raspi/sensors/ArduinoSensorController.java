@@ -27,7 +27,7 @@ public class ArduinoSensorController {
      */
 	public ArduinoSensorController(){
 		createSensors();
-		isConnected = connectToArduino();
+		//isConnected = connectToArduino();
 		
 		if(isConnected){
 			logger.info("Arduino connected :)");

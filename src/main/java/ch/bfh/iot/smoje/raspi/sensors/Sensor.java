@@ -39,22 +39,22 @@ public class Sensor implements SmojeSensor {
 	 */
 	@Override
 	public String getValue() {
-		
-		ArduinoSensorController.arduinoLink.addRawDataListener(new RawDataListener() {
-			@Override
-			public void parseInput(String arg0, int arg1, int[] arg2) {
-				StringBuffer stringBuffer = new StringBuffer();
-				for(int intCharacter : arg2){
-					stringBuffer.append((char) intCharacter);
-				}
-				temporaryValue = Double.parseDouble(stringBuffer.toString());
+		final ArduinoConnector arduinoConnector = new ArduinoConnector();
+		arduinoConnector.initialize();
+		Thread t=new Thread() {
+			public void run() {
+				//the following line will keep this app alive for 10 seconds,
+				//waiting for events to occur and responding to them (printing incoming messages to console).
+				try {
+					Thread.sleep(2500);
+					arduinoConnector.writeData("3");
+				} catch (InterruptedException ie) {}
 			}
-		});
-		
-		ArduinoSensorController.arduinoLink.writeSerial(this.sensorId);
+		};
+		t.start();
 		
 		//TODO introduce mechanism to make sure value is plausible
-		return String.valueOf(temporaryValue);
+		return String.valueOf(arduinoConnector.getIncomingData());
 	}
 
 	/**
