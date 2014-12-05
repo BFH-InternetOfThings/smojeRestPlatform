@@ -1,7 +1,9 @@
 package ch.bfh.iot.smoje.raspi.sensors;
 
+import org.apache.logging.log4j.Logger;
 import org.zu.ardulink.RawDataListener;
 
+import ch.bfh.iot.smoje.raspi.SmojeServer;
 import ch.bfh.iot.smoje.raspi.common.SensorState;
 
 /**
@@ -11,11 +13,14 @@ import ch.bfh.iot.smoje.raspi.common.SensorState;
  */
 public class Sensor implements SmojeSensor {
 	
-	private			SensorType		sensorType;
-	private 		SensorState 	state 		= SensorState.OK;
-	private final 	String 			unit;
-	private final 	String 			sensorId;
-	private	 		double			temporaryValue;
+	private			SensorType			sensorType;
+	private 		SensorState 		state 				= SensorState.OK;
+	private final 	String 				unit;
+	private final 	String 				sensorId;
+	private	 		double				temporaryValue;
+	private 		Logger 				logger 				= SmojeServer.logger;
+	private			ArduinoSensorController	arduinoController;
+//	private			String				value;
 
 	/*
 	 * Constructor
@@ -25,6 +30,8 @@ public class Sensor implements SmojeSensor {
 		this.sensorType = sensorType;
 		this.unit = unit;
 		this.sensorId = sensorId;
+		this.arduinoController = ArduinoSensorController.getInstance();
+		logger.info("instantiated new sensor. SensorType: " + sensorType.name() + ", ID: " + sensorId);
 	}
 
 	@Override
@@ -39,22 +46,26 @@ public class Sensor implements SmojeSensor {
 	 */
 	@Override
 	public String getValue() {
-		final ArduinoConnector arduinoConnector = new ArduinoConnector();
-		arduinoConnector.initialize();
-		Thread t=new Thread() {
-			public void run() {
-				//the following line will keep this app alive for 10 seconds,
-				//waiting for events to occur and responding to them (printing incoming messages to console).
-				try {
-					Thread.sleep(2500);
-					arduinoConnector.writeData("3");
-				} catch (InterruptedException ie) {}
-			}
-		};
-		t.start();
 		
-		//TODO introduce mechanism to make sure value is plausible
-		return String.valueOf(arduinoConnector.getIncomingData());
+		return arduinoController.getValueOverSerialConnection(sensorId);
+		
+//		Thread t = new Thread() {
+//			public void run() {
+//				//the following line will keep this app alive for 2 seconds,
+//				//waiting for events to occur and responding to them (printing incoming messages to console).
+//				try {
+//					Thread.sleep(2000);
+//					value = arduinoConnector.getValueOverSerialConnection(sensorId);
+//				} catch (InterruptedException ie) {
+//					value = null;
+//					//TODO log
+//				}
+//			}
+//		};
+//		t.start();
+//		
+//		//TODO introduce mechanism to make sure value is plausible
+//		return value;
 	}
 
 	/**

@@ -1,7 +1,17 @@
 package ch.bfh.iot.smoje.raspi.sensors;
 
+import gnu.io.CommPortIdentifier;
+import gnu.io.SerialPort;
+import gnu.io.SerialPortEvent;
+import gnu.io.SerialPortEventListener;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.TooManyListenersException;
 
 import org.apache.logging.log4j.Logger;
 import org.zu.ardulink.Link;
@@ -15,25 +25,89 @@ import ch.bfh.iot.smoje.raspi.exceptions.SensorNotAvailableException;
  */
 public class ArduinoSensorController {
 	
-    private static final 	String 					CONNECTION_PORT 		= "/dev/ttyS80";
-    private static final 	int 					BAUD_RATE 				= 9600;
     public 	static 			Link 					arduinoLink 			= Link.getDefaultInstance();
     private 				Logger 					logger 					= SmojeServer.logger;
     private 				boolean					isConnected				= false;
     private 				ArrayList<SmojeSensor> 	arduinoSensorsOnSmoje 	= new ArrayList<>();
 
+    
+	private static ArduinoSensorController instance = new ArduinoSensorController();
+	private SerialPort serialPort;
+	private String temporaryResult;
+	
+	private static final String PORT_NAMES[] = { 
+		"/dev/ttyACM0", // Raspberry Pi
+	};
+	/**
+	* A BufferedReader which will be fed by a InputStreamReader 
+	* converting the bytes into characters 
+	* making the displayed results codepage independent
+	*/
+	private BufferedReader input;
+	private static OutputStream output; /// The output stream to the port */
+	private static final int TIME_OUT = 2000; // Milliseconds to block while waiting for port open */
+	private static final int DATA_RATE = 9600; // Default bits per second for COM port
+	
     /*
      * Constructor
      */
 	public ArduinoSensorController(){
 		createSensors();
-		//isConnected = connectToArduino();
-		
-		if(isConnected){
-			logger.info("Arduino connected :)");
+		initialize();
+	}
+	
+	public void initialize() {
+		// the next line is for Raspberry Pi and 
+        // gets us into the while loop and was suggested here was suggested http://www.raspberrypi.org/phpBB3/viewtopic.php?f=81&t=32186
+        System.setProperty("gnu.io.rxtx.SerialPorts", "/dev/ttyACM0");
+
+		CommPortIdentifier portId = null;
+		Enumeration portEnum = CommPortIdentifier.getPortIdentifiers();
+
+		//First, Find an instance of serial port as set in PORT_NAMES.
+		while (portEnum.hasMoreElements()) {
+			CommPortIdentifier currPortId = (CommPortIdentifier) portEnum.nextElement();
+			for (String portName : PORT_NAMES) {
+				if (currPortId.getName().equals(portName)) {
+					portId = currPortId;
+					break;
+				}
+			}
 		}
-		else{
-			logger.info("Arduino not connected :'(");
+		if (portId == null) {
+			System.out.println("Could not find COM port.");
+			return;
+		}
+
+		try {
+			// open serial port, and use class name for the appName.
+			serialPort = (SerialPort) portId.open(this.getClass().getName(),
+					TIME_OUT);
+
+			// set port parameters
+			serialPort.setSerialPortParams(DATA_RATE,
+					SerialPort.DATABITS_8,
+					SerialPort.STOPBITS_1,
+					SerialPort.PARITY_NONE);
+
+			// open the streams
+			input = new BufferedReader(new InputStreamReader(serialPort.getInputStream()));
+			output = serialPort.getOutputStream();
+
+			serialPort.notifyOnDataAvailable(true);
+		} catch (Exception e) {
+			System.err.println(e.toString());
+		}
+	}
+	
+	/**
+	 * This should be called when you stop using the port.
+	 * This will prevent port locking on platforms like Linux.
+	 */
+	public synchronized void close() {
+		if (serialPort != null) {
+			serialPort.removeEventListener();
+			serialPort.close();
 		}
 	}
 	
@@ -54,51 +128,6 @@ public class ArduinoSensorController {
 	}
 	
 	/**
-	 * Gathers the value of the sensor given in parameter
-	 * @param sensorType {@link SensorType} of requested sensor
-	 * @return {@link String} with value
-	 * @throws SensorNotAvailableException if sensor is not available
-	 */
-	public String getSensorData(SensorType sensorType) throws SensorNotAvailableException{
-		SmojeSensor requestedSensor = null;
-		
-		for(SmojeSensor sensor : arduinoSensorsOnSmoje){
-			if(sensor.getSensorType().equals(sensorType)){
-				requestedSensor = sensor; 
-			}
-		}
-		
-		if(requestedSensor != null){
-			return requestedSensor.getValue();
-		}
-		else{
-			throw new SensorNotAvailableException(sensorType.name() + " is not available on this smoje");
-		}
-	}
-	
-	/**
-	 * Gathers values of all sensors available on smoje
-	 * @return {@link HashMap<@link SensorType, @link String} containing type of sensor and value
-	 */
-	public HashMap<SensorType, String> getAllSensorData(){
-		HashMap<SensorType, String> sensorData = new HashMap<SensorType, String>();
-		
-		for(SmojeSensor sensor : arduinoSensorsOnSmoje){
-			sensorData.put(sensor.getSensorType(), sensor.getValue());
-		}
-		return sensorData;
-	}
-	
-	/**
-	 * Establishes connection to Arduino
-	 * @return {@link Boolean} whether successful or not
-	 */
-	private boolean connectToArduino(){
-        boolean connected = arduinoLink.connect(CONNECTION_PORT, BAUD_RATE);
-		return connected;
-	}
-	
-	/**
 	 * Getter for sensors connected to Arduino
 	 * @return {@link ArrayList<>} with sensors
 	 */
@@ -107,11 +136,47 @@ public class ArduinoSensorController {
 	}
 	
 	/**
-	 * Sends the message in parameter to Arduino over serial connection
-	 * @param message {@link String} to send
+	 * Sends the sensorId in parameter to arduino over serial connection
+	 * gets the result that comes back over Serial 
+	 * @param sensorId
+	 * @return
 	 */
-	public void sendToArduino(String message){
-		logger.info("Writing message to Arduino: " + message);
-        arduinoLink.writeSerial(message);
+	public synchronized String getValueOverSerialConnection(String sensorId) {
+		
+		try {
+			serialPort.addEventListener(new SerialPortEventListener() {
+				
+				@Override
+				public void serialEvent(SerialPortEvent serialEvent) {
+					if (serialEvent.getEventType() == SerialPortEvent.DATA_AVAILABLE) {
+						try {
+							temporaryResult = input.readLine();
+						} catch (Exception e) {
+							temporaryResult = null;
+							//TODO log error
+						}
+					}
+				}
+			});
+		} catch (TooManyListenersException e1) {
+			temporaryResult = null;
+			return temporaryResult;
+			//TODO log
+		}
+		
+		 System.out.println("Sent: " + sensorId);
+		 try {
+			 output.write(sensorId.getBytes());
+			 output.flush();
+		 } catch (Exception e) {
+			 System.out.println("could not write to port");
+			 //TODO log
+		 }
+		 return temporaryResult;
 	}
+	
+	public static ArduinoSensorController getInstance(){
+		return instance;
+	}
+	
 }
