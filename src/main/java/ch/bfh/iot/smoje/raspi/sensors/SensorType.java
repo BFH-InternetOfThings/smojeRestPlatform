@@ -11,16 +11,16 @@ import java.util.Map;
 public enum SensorType {
 	CAMERA ("air.camera"),
 	HUMIDITY ("air.humidity"),
-	AIR_TEMPERATURE ("air.humidity"),
-	ATMOSPHERIC_PRESSURE ("air.humidity"),
-	GEIGER ("air.humidity"),
-	ACCELERATION ("air.humidity"),
-	WIND_SPEED ("air.humidity"),
-	WIND_DIRECTION ("air.humidity"),
-	RAIN_AMOUNT ("air.humidity"),
-	UV_LIGHT ("air.humidity"),
-	COMPASS ("air.humidity"),
-	WATER_TEMPERATURE ("air.humidity");
+	AIR_TEMPERATURE ("air.temperature"),
+	ATMOSPHERIC_PRESSURE ("air.athmosphericpressure"),
+	GEIGER ("air.geiger"),
+	ACCELERATION ("air.acceleration"),
+	WIND_SPEED ("air.windspeed"),
+	WIND_DIRECTION ("air.winddirection"),
+	RAIN_AMOUNT ("air.rainamount"),
+	UV_LIGHT ("air.uvlight"),
+	COMPASS ("air.compass"),
+	WATER_TEMPERATURE ("water.temperature");
 	
     private final String key;
 	

@@ -56,6 +56,27 @@ public class ArduinoSensorController {
 		initialize();
 	}
 	
+	/**
+	 * Creates all instances of available sensors and adds them to {@link ArrayList}
+	 */
+	private void createSensors(){
+		//goes trough all sensor keys that are enables in config file
+		for(String key : SmojeServer.config.getAvailableSensorList()){
+			System.out.println("key is: " + key);
+			//gather information about sensor
+			SensorType sensorType = SensorType.get(key);
+			
+			if (sensorType == null){
+				System.out.println("sensor type is null");
+			}
+			String unit = SmojeServer.config.getSensorUnit(key);
+			String id = SmojeServer.config.getSensorId(key);
+		
+			//instantiate new sensor with information
+			arduinoSensorsOnSmoje.add(new Sensor(sensorType, unit, id));
+		}
+	}
+	
 	public void initialize() {
 		// the next line is for Raspberry Pi and 
         // gets us into the while loop and was suggested here was suggested http://www.raspberrypi.org/phpBB3/viewtopic.php?f=81&t=32186
@@ -108,22 +129,6 @@ public class ArduinoSensorController {
 		if (serialPort != null) {
 			serialPort.removeEventListener();
 			serialPort.close();
-		}
-	}
-	
-	/**
-	 * Creates all instances of available sensors and adds them to {@link ArrayList}
-	 */
-	private void createSensors(){
-		//goes trough all sensor keys that are enables in config file
-		for(String key : SmojeServer.config.getAvailableSensorList()){
-			//gather information about sensor
-			SensorType sensorType = SensorType.get(key);
-			String unit = SmojeServer.config.getSensorUnit(key);
-			String id = SmojeServer.config.getSensorId(key);
-		
-			//instantiate new sensor with information
-			arduinoSensorsOnSmoje.add(new Sensor(sensorType, unit, id));
 		}
 	}
 	
