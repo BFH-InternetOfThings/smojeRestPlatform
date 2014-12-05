@@ -8,6 +8,7 @@ import org.eclipse.jetty.servlet.ServletHolder;
 import org.glassfish.jersey.server.ServerProperties;
 
 import ch.bfh.iot.smoje.raspi.config.Configuration;
+import ch.bfh.iot.smoje.raspi.sensors.ArduinoSensorController;
 
 public class SmojeServer {
 	

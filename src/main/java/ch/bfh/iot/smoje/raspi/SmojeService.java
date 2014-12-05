@@ -28,12 +28,13 @@ public class SmojeService {
 
     static {
     	//Instantiate necessary sensors and controllers
-    	ArduinoSensorController arduController = new ArduinoSensorController();
+    	
         RaspiCamera cam = new RaspiCamera();
         MockCamera cam2 = new MockCamera();
         
         //add sensors to list
-    	for(SmojeSensor sensor : arduController.getArduinoSensors()){
+        
+    	for(SmojeSensor sensor : ArduinoSensorController.getInstance().getArduinoSensors()){
     		sensors.put(sensor.getId(), sensor);
     	}
         sensors.put(cam.getId(), cam);

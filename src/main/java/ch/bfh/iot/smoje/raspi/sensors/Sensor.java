@@ -19,8 +19,7 @@ public class Sensor implements SmojeSensor {
 	private final 	String 				sensorId;
 	private	 		double				temporaryValue;
 	private 		Logger 				logger 				= SmojeServer.logger;
-	private			ArduinoSensorController	arduinoController;
-//	private			String				value;
+	private			String				value;
 
 	/*
 	 * Constructor
@@ -30,7 +29,6 @@ public class Sensor implements SmojeSensor {
 		this.sensorType = sensorType;
 		this.unit = unit;
 		this.sensorId = sensorId;
-		this.arduinoController = ArduinoSensorController.getInstance();
 		logger.info("instantiated new sensor. SensorType: " + sensorType.name() + ", ID: " + sensorId);
 	}
 
@@ -47,25 +45,26 @@ public class Sensor implements SmojeSensor {
 	@Override
 	public String getValue() {
 		
-		return arduinoController.getValueOverSerialConnection(sensorId);
+		System.out.println(ArduinoSensorController.getInstance().getValueOverSerialConnection(sensorId));
+		value = ArduinoSensorController.getInstance().getValueOverSerialConnection(sensorId);
 		
-//		Thread t = new Thread() {
-//			public void run() {
-//				//the following line will keep this app alive for 2 seconds,
-//				//waiting for events to occur and responding to them (printing incoming messages to console).
-//				try {
-//					Thread.sleep(2000);
-//					value = arduinoConnector.getValueOverSerialConnection(sensorId);
-//				} catch (InterruptedException ie) {
-//					value = null;
-//					//TODO log
-//				}
-//			}
-//		};
-//		t.start();
-//		
-//		//TODO introduce mechanism to make sure value is plausible
-//		return value;
+		/*Thread t = new Thread() {
+			public void run() {
+				//the following line will keep this app alive for 2 seconds,
+				//waiting for events to occur and responding to them (printing incoming messages to console).
+				try {
+					Thread.sleep(2000);
+					
+				} catch (InterruptedException ie) {
+					value = null;
+					//TODO log
+				}
+			}
+		};
+		t.start();*/
+		
+		//TODO introduce mechanism to make sure value is plausible
+		return value;
 	}
 
 	/**

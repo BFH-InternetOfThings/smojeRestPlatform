@@ -26,12 +26,12 @@ import ch.bfh.iot.smoje.raspi.exceptions.SensorNotAvailableException;
 public class ArduinoSensorController {
 	
     public 	static 			Link 					arduinoLink 			= Link.getDefaultInstance();
-    private 				Logger 					logger 					= SmojeServer.logger;
+    private static 				Logger 					logger 					= SmojeServer.logger;
     private 				boolean					isConnected				= false;
     private 				ArrayList<SmojeSensor> 	arduinoSensorsOnSmoje 	= new ArrayList<>();
 
     
-	private static ArduinoSensorController instance = new ArduinoSensorController();
+	private static ArduinoSensorController instance;
 	private SerialPort serialPort;
 	private String temporaryResult;
 	
@@ -51,7 +51,7 @@ public class ArduinoSensorController {
     /*
      * Constructor
      */
-	public ArduinoSensorController(){
+	private ArduinoSensorController(){
 		createSensors();
 		initialize();
 	}
@@ -78,6 +78,7 @@ public class ArduinoSensorController {
 	}
 	
 	public void initialize() {
+		logger.info("initialize-method ArduinoSensorConctroller");
 		// the next line is for Raspberry Pi and 
         // gets us into the while loop and was suggested here was suggested http://www.raspberrypi.org/phpBB3/viewtopic.php?f=81&t=32186
         System.setProperty("gnu.io.rxtx.SerialPorts", "/dev/ttyACM0");
@@ -146,7 +147,7 @@ public class ArduinoSensorController {
 	 * @param sensorId
 	 * @return
 	 */
-	public synchronized String getValueOverSerialConnection(String sensorId) {
+	public String getValueOverSerialConnection(String sensorId) {
 		
 		try {
 			serialPort.addEventListener(new SerialPortEventListener() {
@@ -156,8 +157,11 @@ public class ArduinoSensorController {
 					if (serialEvent.getEventType() == SerialPortEvent.DATA_AVAILABLE) {
 						try {
 							temporaryResult = input.readLine();
+							logger.info("got result from arduino");
+							logger.info("temporary result: " + temporaryResult);
 						} catch (Exception e) {
 							temporaryResult = null;
+							logger.info("exception: " + e.getMessage());
 							//TODO log error
 						}
 					}
@@ -177,10 +181,17 @@ public class ArduinoSensorController {
 			 System.out.println("could not write to port");
 			 //TODO log
 		 }
+		 
+		 logger.info("return temporary result: " + temporaryResult);
 		 return temporaryResult;
 	}
 	
 	public static ArduinoSensorController getInstance(){
+		if (instance == null) {
+			logger.info("create new Arduino instance");
+			instance = new ArduinoSensorController();
+		}
+		logger.info("return Arduino instance");
 		return instance;
 	}
 	
