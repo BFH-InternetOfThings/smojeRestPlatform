@@ -1,6 +1,7 @@
 package ch.bfh.iot.smoje.raspi;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
@@ -10,10 +11,11 @@ import ch.bfh.iot.smoje.raspi.config.Configuration;
 
 public class SmojeServer {
 	
-	public final static Logger 		logger 				= Logger.getLogger(SmojeServer.class);
+	public final static Logger 		logger 				= LogManager.getLogger(SmojeServer.class);
 	public final static Configuration config = new Configuration();
 
     public static void main(String[] args) throws Exception {
+    	logger.info("smoje rest platform has been started");
     	
         // URL: http://localhost:8080/smoje/sensors/
         ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);

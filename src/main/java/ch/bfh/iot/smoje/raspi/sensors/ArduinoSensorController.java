@@ -3,7 +3,7 @@ package ch.bfh.iot.smoje.raspi.sensors;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.zu.ardulink.Link;
 
 import ch.bfh.iot.smoje.raspi.SmojeServer;
