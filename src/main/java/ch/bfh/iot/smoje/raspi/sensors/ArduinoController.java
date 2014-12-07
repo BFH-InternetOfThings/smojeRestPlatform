@@ -171,18 +171,15 @@ public class ArduinoController implements SerialPortEventListener {
 		case SerialPortEvent.OUTPUT_BUFFER_EMPTY:
 			break;
 		case SerialPortEvent.DATA_AVAILABLE:
-			byte[] readBuffer = new byte[20];
-
+			
 			try {
-				while (inputStream.available() > 0) {
-					int numBytes = inputStream.read(readBuffer);
-				}
-				String receivedSerialData = new String(readBuffer);
-				logger.info("received serial input is " + receivedSerialData);
+				String serialData = input.readLine();
+				logger.info("received serial input is " + serialData);
+
 				if(activeSensor != null){
 					logger.info("setting serial data on sensor");
 					try{
-						activeSensor.setSensorValue(Double.valueOf(receivedSerialData));
+						activeSensor.setSensorValue(Double.valueOf(serialData));
 						arduinoDataReceived = true;
 					}
 					catch(NumberFormatException ex){
@@ -191,9 +188,34 @@ public class ArduinoController implements SerialPortEventListener {
 					}
 					sleepThread.interrupt();
 				}
-			} catch (IOException e) {
+			}
+			catch (IOException e) {
+				e.printStackTrace();
 				//swallow
 			}
+//			byte[] readBuffer = new byte[20];
+//
+//			try {
+//				while (inputStream.available() > 0) {
+//					int numBytes = inputStream.read(readBuffer);
+//				}
+//				String receivedSerialData = new String(readBuffer);
+//				logger.info("received serial input is " + receivedSerialData);
+//				if(activeSensor != null){
+//					logger.info("setting serial data on sensor");
+//					try{
+//						activeSensor.setSensorValue(Double.valueOf(receivedSerialData));
+//						arduinoDataReceived = true;
+//					}
+//					catch(NumberFormatException ex){
+//						logger.warn("received sensor input data was not a number", ex);
+//						arduinoDataReceived = false;
+//					}
+//					sleepThread.interrupt();
+//				}
+//			} catch (IOException e) {
+//				//swallow
+//			}
 			break;
 		}
 	}
