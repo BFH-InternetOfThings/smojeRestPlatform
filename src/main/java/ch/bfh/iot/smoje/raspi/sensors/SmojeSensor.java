@@ -14,4 +14,6 @@ public interface SmojeSensor {
 
 	public SensorType getSensorType();
 
+	public void setSensorValue(double value);
+
 }

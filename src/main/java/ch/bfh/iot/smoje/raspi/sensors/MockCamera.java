@@ -57,4 +57,7 @@ public class MockCamera implements SmojeSensor {
 	public SensorType getSensorType() {
 		return SensorType.CAMERA;
 	}
+
+	@Override
+	public void setSensorValue(double value) {}
 }

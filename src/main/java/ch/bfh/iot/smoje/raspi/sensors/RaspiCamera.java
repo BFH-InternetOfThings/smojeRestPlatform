@@ -72,4 +72,7 @@ public class RaspiCamera implements SmojeSensor {
 		return SensorType.CAMERA;
 	}
 
+	@Override
+	public void setSensorValue(double value) {}
+
 }

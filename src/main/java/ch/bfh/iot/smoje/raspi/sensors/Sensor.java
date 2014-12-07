@@ -1,10 +1,10 @@
 package ch.bfh.iot.smoje.raspi.sensors;
 
 import org.apache.logging.log4j.Logger;
-import org.zu.ardulink.RawDataListener;
 
-import ch.bfh.iot.smoje.raspi.SmojeServer;
+import ch.bfh.iot.smoje.raspi.Main;
 import ch.bfh.iot.smoje.raspi.common.SensorState;
+import ch.bfh.iot.smoje.raspi.exceptions.ArduinoBusyException;
 
 /**
  * Represents a sensor
@@ -17,9 +17,8 @@ public class Sensor implements SmojeSensor {
 	private 		SensorState 		state 				= SensorState.OK;
 	private final 	String 				unit;
 	private final 	String 				sensorId;
-	private	 		double				temporaryValue;
-	private 		Logger 				logger 				= SmojeServer.logger;
-	private			String				value;
+	private 		Logger 				logger 				= Main.logger;
+	private			double				value;
 
 	/*
 	 * Constructor
@@ -44,27 +43,19 @@ public class Sensor implements SmojeSensor {
 	 */
 	@Override
 	public String getValue() {
+		if(this.sensorId == null) return "Sensor does not exist on this smoje";
 		
-		System.out.println(ArduinoSensorController.getInstance().getValueOverSerialConnection(sensorId));
-		value = ArduinoSensorController.getInstance().getValueOverSerialConnection(sensorId);
+		boolean success = false;
+		try {
+			success = Main.arduinoController.getValueOverSerialConnection(this);
+		} catch (ArduinoBusyException e) {
+			logger.warn(e.getMessage(), e);
+		}
 		
-		/*Thread t = new Thread() {
-			public void run() {
-				//the following line will keep this app alive for 2 seconds,
-				//waiting for events to occur and responding to them (printing incoming messages to console).
-				try {
-					Thread.sleep(2000);
-					
-				} catch (InterruptedException ie) {
-					value = null;
-					//TODO log
-				}
-			}
-		};
-		t.start();*/
-		
+		if(success) return String.valueOf(value);
+		else return "failed";
 		//TODO introduce mechanism to make sure value is plausible
-		return value;
+
 	}
 
 	/**
@@ -91,5 +82,13 @@ public class Sensor implements SmojeSensor {
 	@Override
 	public SensorType getSensorType() {
 		return this.sensorType;
+	}
+	
+	/**
+	 * @return {@link SensorType}
+	 */
+	@Override
+	public void setSensorValue(double value) {
+		this.value = value;
 	}
 }

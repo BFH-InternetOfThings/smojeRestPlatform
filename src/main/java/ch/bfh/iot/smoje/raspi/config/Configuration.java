@@ -8,7 +8,7 @@ import java.util.Map.Entry;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 
-import ch.bfh.iot.smoje.raspi.SmojeServer;
+import ch.bfh.iot.smoje.raspi.Main;
 
 /**
  * Configuration of Smoje sensor system
@@ -16,7 +16,7 @@ import ch.bfh.iot.smoje.raspi.SmojeServer;
  */
 public class Configuration {
 	
-	private 		Logger 		logger 				= SmojeServer.logger;
+	private 		Logger 		logger 				= Main.logger;
 	private final 	Properties 	properties 			= new Properties();
 	private final 	String		propertiesFileName	= "smoje.sensors.properties";
 	

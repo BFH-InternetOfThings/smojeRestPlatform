@@ -132,7 +132,7 @@
 				<configuration>
 					<archive>
 						<manifest>
-							<mainClass>ch.bfh.iot.smoje.raspi.SmojeServer</mainClass>
+							<mainClass>ch.bfh.iot.smoje.raspi.Main</mainClass>
 						</manifest>
 					</archive>
 					<descriptorRefs>

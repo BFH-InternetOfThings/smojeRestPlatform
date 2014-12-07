@@ -5,12 +5,6 @@ package ch.bfh.iot.smoje.raspi.exceptions;
  */
 public class ArduinoNotReachableException extends Exception {
 
-
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 5494748813262344094L;
-
 	public ArduinoNotReachableException() {
 	}
 
