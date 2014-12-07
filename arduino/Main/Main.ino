@@ -29,6 +29,7 @@ OneWire oneWire(ONE_WIRE_BUS);
 const int xAxis = A5;
 const int yAxis = A6;
 const int zAxis = A7;
+String serialInput;
 
 void displayHMC5883Details(void)
 {
@@ -105,12 +106,19 @@ void loop() {
 }
 
 void serialEvent()
-{
-  
+{  
   while (Serial.available())
   {
+  
+  	serialInput = null;
+    delay(3);  //delay to allow buffer to fill 
     
-    switch(Serial.read())
+    if (Serial.available() > 0) {
+    	char c = Serial.read();  	//gets one byte from serial buffer
+      	serialInput += c; 			//makes the string readString
+    } 
+    
+    switch(serialInput)
     {
       case '1':
         Serial.println(am2315.readTemperature()); 
@@ -151,7 +159,6 @@ void serialEvent()
         
       default:
         Serial.println("no Device on this Number");
-      
     }
   }
 }
