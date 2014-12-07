@@ -14,30 +14,29 @@ import ch.bfh.iot.smoje.raspi.sensors.SmojeSensor;
  * @author Matteo Morandi
  */
 public class Smoje {
-	
-    private Map<String, SmojeSensor> sensors = new HashMap<String, SmojeSensor>();
-    private Map<String, SmojeActor> actors = new HashMap<String, SmojeActor>();
-    
-    
-    /*
-     * Constructor
-     */
-    public Smoje(){
-    	createSensors();
-    	createActors();
-    }
-    
-    /**
-     * Creates all necessary sensors from configuration file
-     */
+
+	private Map<String, SmojeSensor> 	sensors = new HashMap<String, SmojeSensor>();
+	private Map<String, SmojeActor> 	actors 	= new HashMap<String, SmojeActor>();
+
+	/*
+	 * Constructor
+	 */
+	public Smoje(){
+		createSensors();
+		createActors();
+	}
+
+	/**
+	 * Creates all necessary sensors from configuration file
+	 */
 	private void createSensors(){
 		//goes trough all sensor keys that are enables in config file
 		for(String key : Main.config.getAvailableSensorList()){
-			
+
 			String unit;
 			String id;
 			SensorType sensorType = SensorType.get(key);;
-			
+
 			if(key.equals("air.camera")){
 				RaspiCamera camera = new RaspiCamera();
 				sensors.put(camera.getId(), camera);
@@ -46,14 +45,14 @@ public class Smoje {
 				if (sensorType != null){
 					unit = Main.config.getSensorUnit(key);
 					id = Main.config.getSensorId(key);
-					
+
 					Sensor sensor = new Sensor(sensorType, unit, id);
 					sensors.put(sensor.getId(), sensor);
 				}
 			}
 		}
 	}
-	
+
 	/**
 	 * Creates all necessary actors
 	 */
@@ -74,6 +73,6 @@ public class Smoje {
 	public Map<String, SmojeActor> getActors() {
 		return actors;
 	}
-	
-	
+
+
 }

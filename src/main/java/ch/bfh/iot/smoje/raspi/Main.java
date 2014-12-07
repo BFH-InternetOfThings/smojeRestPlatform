@@ -10,17 +10,21 @@ import org.glassfish.jersey.server.ServerProperties;
 import ch.bfh.iot.smoje.raspi.config.Configuration;
 import ch.bfh.iot.smoje.raspi.sensors.ArduinoController;
 
+/**
+ * Main class of smoje sensor platform
+ * @authors Matteo Morandi, Joel Holzer, Noemi Stucki, Priska Wermelinger, Pascal Bohni & CameraDudes TODO
+ */
 public class Main {
 	
-	public final static Logger 		logger 				= LogManager.getLogger(Main.class);
-	public final static Configuration config = new Configuration();
-	public static ArduinoController arduinoController;
-	public static Smoje smoje;
+	public final static Logger 				logger = LogManager.getLogger(Main.class);
+	public final static Configuration 		config = new Configuration();
+	public static 		ArduinoController	arduinoController;
+	public static 		Smoje 				smoje;
 
 	/**
 	 * Main Method
-	 * @param args
-	 * @throws Exception
+	 * @param args not used
+	 * @throws Exception if our code sucks
 	 */
     public static void main(String[] args) throws Exception {
     	logger.info("smoje rest platform has been started");
@@ -47,6 +51,5 @@ public class Main {
         } finally {
             jettyServer.destroy();
         }
-
     }
 }

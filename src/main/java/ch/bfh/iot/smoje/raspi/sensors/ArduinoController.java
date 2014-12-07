@@ -7,7 +7,6 @@ import gnu.io.SerialPortEventListener;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.util.Enumeration;
@@ -20,10 +19,9 @@ import ch.bfh.iot.smoje.raspi.exceptions.ArduinoBusyException;
 /**
  * Class handles reading of sensor data, creates connection to Arduino board and gets values for sensors
  * TODO check if serial connection could successfully be established, else throw exception or notify somehow
- * @author Matteo Morandi
+ * @author Matteo Morandi, Joel Holzer
  */
 public class ArduinoController implements SerialPortEventListener {
-	
 	
 	private static final 	int 			PORT_TIME_OUT 			= 2000; // Milliseconds to block while waiting for port open
 	private static final 	int 			DATA_RATE 				= 9600; // Default bits per second for COM port
@@ -32,7 +30,6 @@ public class ArduinoController implements SerialPortEventListener {
 	private 				SerialPort 		serialPort;
 	private 				BufferedReader 	input;	//Will be fed by an InputStreamReader, converting the bytes into characters making the displayed results codepage independent
 	private static 			OutputStream 	output; //Output stream to the port
-	private 				InputStream 	inputStream;
     private					boolean 		arduinoDataReceived 	= false;
     private 				SmojeSensor		activeSensor;
     private 				Thread 			sleepThread;
@@ -87,11 +84,6 @@ public class ArduinoController implements SerialPortEventListener {
 					SerialPort.STOPBITS_1,
 					SerialPort.PARITY_NONE
 			);
-
-		    try {
-		        inputStream = serialPort.getInputStream();
-		      } catch (IOException e) {
-		      }
 		    
 			// open the streams
 			input = new BufferedReader(new InputStreamReader(serialPort.getInputStream()));
@@ -193,29 +185,6 @@ public class ArduinoController implements SerialPortEventListener {
 				e.printStackTrace();
 				//swallow
 			}
-//			byte[] readBuffer = new byte[20];
-//
-//			try {
-//				while (inputStream.available() > 0) {
-//					int numBytes = inputStream.read(readBuffer);
-//				}
-//				String receivedSerialData = new String(readBuffer);
-//				logger.info("received serial input is " + receivedSerialData);
-//				if(activeSensor != null){
-//					logger.info("setting serial data on sensor");
-//					try{
-//						activeSensor.setSensorValue(Double.valueOf(receivedSerialData));
-//						arduinoDataReceived = true;
-//					}
-//					catch(NumberFormatException ex){
-//						logger.warn("received sensor input data was not a number", ex);
-//						arduinoDataReceived = false;
-//					}
-//					sleepThread.interrupt();
-//				}
-//			} catch (IOException e) {
-//				//swallow
-//			}
 			break;
 		}
 	}
