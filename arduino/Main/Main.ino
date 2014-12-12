@@ -9,6 +9,8 @@
 #include <DallasTemperature.h>
 #include <MPU6050.h>
 #include <DueTimer.h>
+#include <stdio.h>
+#include <string.h>
 
 //PIN-Belegung Weather Station
 #define PIN_ANEMOMETER 15
@@ -118,7 +120,6 @@ void setup() {
   
 }
 
-
 void countAnemometer() {
    numRevsAnemometer++;
 }
@@ -128,19 +129,18 @@ void countRain() {
   // Serial.print("countRain");
 }
 
-
 void callback()
 {
   /*the ISR for the timer interrupt, called every 10 seconds*/
 //check how many times the switch was closed on this period? this value is on numRevsAnemometer
-  WindSpeed = (numRevsAnemometer) * 2.4 / 10; //2.4 K/h for one switch closure per second
+  WindSpeed = (numRevsAnemometer) * 2.4 / 10 / 3.6; //2.4 K/h for one switch closure per second, / 3.6 to convert from km/h to m/s
   numRevsAnemometer = 0;
 
 /*rain caculation*/
   if (visits_counter < top_times) visits_counter++;
   else{
-    Percipitation = 0.28*(numClicksRain*60 / 10);
-    //0.2794 mm per contact closure; this step gives number of clicks per minute unit = mm per minute
+    Percipitation = 0.28*(numClicksRain*60 / 10) * 60;
+    //0.2794 mm per contact closure; this step gives number of clicks per minute unit = mm per minute;  the last *60 to convert from mm/min to mm/h (equals mm/square meter)
     numClicksRain = 0;
     visits_counter = 0;
   }
@@ -151,11 +151,58 @@ void loop() {
   
 }
 
+int getIntForKey(String str){
+	if (strcmp(string, "smoje.battery") == 0){
+		return 0;
+	}
+	else if (strcmp(string, "air.temperature") == 0){
+		return 1;
+	}
+	else if (strcmp(string, "air.humidity") == 0){
+		return 2;
+	}
+	else if (strcmp(string, "air.athmosphericpressure") == 0){
+		return 3;
+	}
+	else if (strcmp(string, "air.geiger") == 0){
+		return 4;
+	}
+	else if (strcmp(string, "air.acceleration") == 0){
+		return 5;
+	}
+	else if (strcmp(string, "air.windspeed") == 0){
+		return 6;
+	}
+	else if (strcmp(string, "air.winddirection") == 0){
+		return 7;
+	}
+	else if (strcmp(string, "air.rainamount") == 0){
+		return 8;
+	}
+	else if (strcmp(string, "air.uvlight") == 0){
+		return 9;
+	}
+	else if (strcmp(string, "air.compass") == 0){
+		return 10;
+	}	
+	else if (strcmp(string, "water.temperature") == 0){
+		return 11;
+	}
+	else if (strcmp(string, "water.salinity") == 0){
+		return 12;
+	}
+	else if (strcmp(string, "water.dissolvedoxygen") == 0){
+		return 13;
+	}
+	else if (strcmp(string, "water.drift") == 0){
+		return 14;
+	}
+}
+
 void serialEvent()
 {  
   while (Serial.available())
   {
-  
   	serialInput = null;
     delay(3);  //delay to allow buffer to fill 
     
@@ -164,7 +211,7 @@ void serialEvent()
       	serialInput += c; 			//makes the string readString
     } 
     
-    switch(serialInput)
+    switch(getIntForKey(serialInput))
     {
       case '1':
         Serial.println(am2315.readTemperature()); 
@@ -175,44 +222,24 @@ void serialEvent()
         break;
         
       case '3':
-        Serial.println(mpl115a2.getTemperature());
-        break;
-        
-      case '4':
         Serial.println(mpl115a2.getPressure());
         break;
         
-      case '5':
-        Serial.println(analogRead(xAxis));
-        break;
-        
       case '6':
-        Serial.println(analogRead(yAxis));
-        break;
-        
-      case '7':
-        Serial.println(analogRead(zAxis));
-        break;
-        
-      case '8':
-        printHMC5883Values();
-        break;
-         
-      case '9':
-        sensors.requestTemperatures(); // Send the command to get temperatures
-        Serial.println(sensors.getTempCByIndex(0)); // Why "byIndex"? You can have more than one IC on the same bus. 0 refers to the first IC on the wire
-        break;
-        
-      case 'a':
-        Serial.println(analogRead(PIN_VANE));
-        break;
-        
-      case 'b':
         Serial.println(WindSpeed);
         break;
         
-      case 'c':
+      case '7':
+        Serial.println(analogRead(PIN_VANE));
+        break;
+        
+      case '8':
         Serial.println(Percipitation);
+        break;
+        
+      case '11':
+        sensors.requestTemperatures(); // Send the command to get temperatures
+        Serial.println(sensors.getTempCByIndex(0)); // Why "byIndex"? You can have more than one IC on the same bus. 0 refers to the first IC on the wire
         break;
         
       default:
