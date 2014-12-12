@@ -8,6 +8,12 @@
 #include <OneWire.h>  
 #include <DallasTemperature.h>
 #include <MPU6050.h>
+#include <DueTimer.h>
+
+//PIN-Belegung Weather Station
+#define PIN_ANEMOMETER 15
+#define PIN_RAIN 14
+#define PIN_VANE A5
 
 // Data wire is plugged into pin 0 on the Arduino due
 #define ONE_WIRE_BUS 8
@@ -24,7 +30,7 @@ Adafruit_HMC5883_Unified mag = Adafruit_HMC5883_Unified(12345);
 OneWire oneWire(ONE_WIRE_BUS);
  
 // Pass our oneWire reference to Dallas Temperature. 
-//DallasTemperature sensors(&oneWire);
+DallasTemperature sensors(&oneWire);
 
 const int xAxis = A5;
 const int yAxis = A6;
@@ -96,10 +102,50 @@ void setup() {
      //while (1);
   }
   
-  //sensors.begin();
+  sensors.begin();
   //Serial.println(sensors.getDeviceCount());
   
+  pinMode(PIN_ANEMOMETER, INPUT);
+  digitalWrite(PIN_ANEMOMETER, HIGH);
+  attachInterrupt(PIN_ANEMOMETER, countAnemometer, FALLING);
+  
+  pinMode(PIN_RAIN, INPUT);
+  digitalWrite(PIN_RAIN, HIGH);
+  attachInterrupt(PIN_RAIN, countRain, FALLING);
+  
+  
+  Timer1.attachInterrupt(callback).start(10000000);  // attaches callback() as a timer overflow interrupt
+  
 }
+
+
+void countAnemometer() {
+   numRevsAnemometer++;
+}
+
+void countRain() {
+  numClicksRain++;
+  // Serial.print("countRain");
+}
+
+
+void callback()
+{
+  /*the ISR for the timer interrupt, called every 10 seconds*/
+//check how many times the switch was closed on this period? this value is on numRevsAnemometer
+  WindSpeed = (numRevsAnemometer) * 2.4 / 10; //2.4 K/h for one switch closure per second
+  numRevsAnemometer = 0;
+
+/*rain caculation*/
+  if (visits_counter < top_times) visits_counter++;
+  else{
+    Percipitation = 0.28*(numClicksRain*60 / 10);
+    //0.2794 mm per contact closure; this step gives number of clicks per minute unit = mm per minute
+    numClicksRain = 0;
+    visits_counter = 0;
+  }
+}
+
 
 void loop() {
   
@@ -151,10 +197,22 @@ void serialEvent()
       case '8':
         printHMC5883Values();
         break;
-        
+         
       case '9':
-        //sensors.requestTemperatures(); // Send the command to get temperatures
-        //Serial.println(sensors.getTempCByIndex(0)); // Why "byIndex"? You can have more than one IC on the same bus. 0 refers to the first IC on the wire
+        sensors.requestTemperatures(); // Send the command to get temperatures
+        Serial.println(sensors.getTempCByIndex(0)); // Why "byIndex"? You can have more than one IC on the same bus. 0 refers to the first IC on the wire
+        break;
+        
+      case 'a':
+        Serial.println(analogRead(PIN_VANE));
+        break;
+        
+      case 'b':
+        Serial.println(WindSpeed);
+        break;
+        
+      case 'c':
+        Serial.println(Percipitation);
         break;
         
       default:
