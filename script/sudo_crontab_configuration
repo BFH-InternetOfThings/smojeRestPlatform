@@ -1,0 +1,2 @@
+@reboot /home/pi/smoje/smojeRestPlatform/scripts/updateSmojeSensorApp.sh
+@reboot /home/pi/smoje/smojeRestPlatform/scripts/startSmojeSensorApp.sh
