@@ -152,49 +152,49 @@ void loop() {
 }
 
 int getIntForKey(String str){
-	if (strcmp(string, "smoje.battery") == 0){
+	if (strcmp(string, "smoje_battery") == 0){
 		return 0;
 	}
-	else if (strcmp(string, "air.temperature") == 0){
+	else if (strcmp(string, "air_temperature") == 0){
 		return 1;
 	}
-	else if (strcmp(string, "air.humidity") == 0){
+	else if (strcmp(string, "air_humidity") == 0){
 		return 2;
 	}
-	else if (strcmp(string, "air.athmosphericpressure") == 0){
+	else if (strcmp(string, "air_athmosphericpressure") == 0){
 		return 3;
 	}
-	else if (strcmp(string, "air.geiger") == 0){
+	else if (strcmp(string, "air_geiger") == 0){
 		return 4;
 	}
-	else if (strcmp(string, "air.acceleration") == 0){
+	else if (strcmp(string, "air_acceleration") == 0){
 		return 5;
 	}
-	else if (strcmp(string, "air.windspeed") == 0){
+	else if (strcmp(string, "air_windspeed") == 0){
 		return 6;
 	}
-	else if (strcmp(string, "air.winddirection") == 0){
+	else if (strcmp(string, "air_winddirection") == 0){
 		return 7;
 	}
-	else if (strcmp(string, "air.rainamount") == 0){
+	else if (strcmp(string, "air_rainamount") == 0){
 		return 8;
 	}
-	else if (strcmp(string, "air.uvlight") == 0){
+	else if (strcmp(string, "air_uvlight") == 0){
 		return 9;
 	}
-	else if (strcmp(string, "air.compass") == 0){
+	else if (strcmp(string, "air_compass") == 0){
 		return 10;
 	}	
-	else if (strcmp(string, "water.temperature") == 0){
+	else if (strcmp(string, "water_temperature") == 0){
 		return 11;
 	}
-	else if (strcmp(string, "water.salinity") == 0){
+	else if (strcmp(string, "water_salinity") == 0){
 		return 12;
 	}
-	else if (strcmp(string, "water.dissolvedoxygen") == 0){
+	else if (strcmp(string, "water_dissolvedoxygen") == 0){
 		return 13;
 	}
-	else if (strcmp(string, "water.drift") == 0){
+	else if (strcmp(string, "water_drift") == 0){
 		return 14;
 	}
 }
