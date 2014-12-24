@@ -39,6 +39,20 @@ const int yAxis = A6;
 const int zAxis = A7;
 String serialInput;
 
+volatile int numRevsAnemometer = 0;
+volatile int numClicksRain = 0;
+volatile float WindSpeed = 0;
+volatile float Percipitation = 0;
+
+/*below counts the number of times we go to the 
+timer interrupt, allows for calcualtion
+of multiples of the timer frequency*/
+int visits_counter = 0;
+/*The value below * 5 seconds = defines
+timer frequency for rain calculation
+e.g. top_times = 6 (* 5 = 30 seconds)*/
+int top_times = 10;
+
 void displayHMC5883Details(void)
 {
   sensor_t sensor;
@@ -151,93 +165,99 @@ void loop() {
   
 }
 
-int getIntForKey(String str){
-	if (strcmp(string, "smoje_battery") == 0){
+int getIntForKey(String string){
+	if (strcmp(string.c_str(),"smoje.battery") == 0){
 		return 0;
 	}
-	else if (strcmp(string, "air_temperature") == 0){
+	else if (strcmp(string.c_str(), "air.temperature") == 0){
 		return 1;
 	}
-	else if (strcmp(string, "air_humidity") == 0){
+	else if (strcmp(string.c_str(), "air.humidity") == 0){
 		return 2;
 	}
-	else if (strcmp(string, "air_athmosphericpressure") == 0){
+	else if (strcmp(string.c_str(), "air.athmosphericpressure") == 0){
 		return 3;
 	}
-	else if (strcmp(string, "air_geiger") == 0){
+	else if (strcmp(string.c_str(), "air.geiger") == 0){
 		return 4;
 	}
-	else if (strcmp(string, "air_acceleration") == 0){
+	else if (strcmp(string.c_str(), "air.acceleration") == 0){
 		return 5;
 	}
-	else if (strcmp(string, "air_windspeed") == 0){
+	else if (strcmp(string.c_str(), "air.windspeed") == 0){
 		return 6;
 	}
-	else if (strcmp(string, "air_winddirection") == 0){
+	else if (strcmp(string.c_str(), "air.winddirection") == 0){
 		return 7;
 	}
-	else if (strcmp(string, "air_rainamount") == 0){
+	else if (strcmp(string.c_str(), "air.rainamount") == 0){
 		return 8;
 	}
-	else if (strcmp(string, "air_uvlight") == 0){
+	else if (strcmp(string.c_str(), "air.uvlight") == 0){
 		return 9;
 	}
-	else if (strcmp(string, "air_compass") == 0){
+	else if (strcmp(string.c_str(), "air.compass") == 0){
 		return 10;
 	}	
-	else if (strcmp(string, "water_temperature") == 0){
+	else if (strcmp(string.c_str(), "water.temperature") == 0){
 		return 11;
 	}
-	else if (strcmp(string, "water_salinity") == 0){
+	else if (strcmp(string.c_str(), "water.salinity") == 0){
 		return 12;
 	}
-	else if (strcmp(string, "water_dissolvedoxygen") == 0){
+	else if (strcmp(string.c_str(), "water.dissolvedoxygen") == 0){
 		return 13;
 	}
-	else if (strcmp(string, "water_drift") == 0){
+	else if (strcmp(string.c_str(), "water.drift") == 0){
 		return 14;
 	}
+        else
+        {
+          return 0;
+        }
 }
 
 void serialEvent()
 {  
-  while (Serial.available())
+  if (Serial.available())
   {
-  	serialInput = null;
-    delay(3);  //delay to allow buffer to fill 
+    serialInput = "";
+    delay(25);  //delay to allow buffer to fill 
     
-    if (Serial.available() > 0) {
+    while (Serial.available()) {
     	char c = Serial.read();  	//gets one byte from serial buffer
       	serialInput += c; 			//makes the string readString
     } 
     
+    Serial.println(serialInput.c_str());
+    
     switch(getIntForKey(serialInput))
     {
-      case '1':
+      case 1:
         Serial.println(am2315.readTemperature()); 
         break;
 
-      case '2':
+      case 2:
         Serial.println(am2315.readHumidity());
         break;
         
-      case '3':
+      case 3:
         Serial.println(mpl115a2.getPressure());
         break;
         
-      case '6':
+      case 6:
         Serial.println(WindSpeed);
         break;
         
-      case '7':
+      case 7:
         Serial.println(analogRead(PIN_VANE));
         break;
         
-      case '8':
+      case 8:
         Serial.println(Percipitation);
         break;
         
-      case '11':
+      case 11:
         sensors.requestTemperatures(); // Send the command to get temperatures
         Serial.println(sensors.getTempCByIndex(0)); // Why "byIndex"? You can have more than one IC on the same bus. 0 refers to the first IC on the wire
         break;
