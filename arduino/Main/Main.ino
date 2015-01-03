@@ -170,7 +170,7 @@ int getIntForKey(String string){
 		return 0;
 	}
 	else if (strcmp(string.c_str(), "air.temperature") == 0){
-		return 1; s
+		return 1;
 	}
 	else if (strcmp(string.c_str(), "air.humidity") == 0){
 		return 2;
