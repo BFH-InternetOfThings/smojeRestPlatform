@@ -18,7 +18,7 @@
 #define PIN_VANE A5
 
 // Data wire is plugged into pin 0 on the Arduino due
-#define ONE_WIRE_BUS 8
+#define ONE_WIRE_BUS 10
 
 
 Adafruit_AM2315 am2315;
@@ -170,7 +170,7 @@ int getIntForKey(String string){
 		return 0;
 	}
 	else if (strcmp(string.c_str(), "air.temperature") == 0){
-		return 1;
+		return 1; s
 	}
 	else if (strcmp(string.c_str(), "air.humidity") == 0){
 		return 2;
