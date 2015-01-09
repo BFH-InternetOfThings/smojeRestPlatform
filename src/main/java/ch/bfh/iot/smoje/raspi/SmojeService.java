@@ -47,7 +47,7 @@ public class SmojeService {
 
     @GET
     @Path("/sensors/{id}")
-    @Produces(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     public SmojeSensor getSensorValueById(@PathParam("id") String id) throws JsonProcessingException {
 
         SmojeSensor sensor = Main.smoje.getSensors().get(id);

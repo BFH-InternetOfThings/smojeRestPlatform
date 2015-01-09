@@ -1,6 +1,8 @@
 package ch.bfh.iot.smoje.raspi.config;
 
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Properties;
 import java.util.Map.Entry;
@@ -27,7 +29,8 @@ public class Configuration {
     	InputStream propertiesInput = null;
     	propertiesInput = Configuration.class.getClassLoader().getResourceAsStream(propertiesFileName);
     	try{
-    		properties.load(propertiesInput);
+    		Reader reader = new InputStreamReader(propertiesInput, "UTF-8");
+    		properties.load(reader);
     	}
     	catch(Exception e){
     		logger.error("could not load properties file");

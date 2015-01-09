@@ -168,17 +168,19 @@ public class ArduinoController implements SerialPortEventListener {
 				String serialData = input.readLine();
 				logger.info("received serial input is " + serialData);
 
-				if(activeSensor != null){
-					logger.info("setting serial data on sensor");
-					try{
-						activeSensor.setSensorValue(Double.valueOf(serialData));
-						arduinoDataReceived = true;
+				if (!activeSensor.getId().equals(serialData)) {
+					if(activeSensor != null){
+						logger.info("setting serial data on sensor");
+						try{
+							activeSensor.setSensorValue(Double.valueOf(serialData));
+							arduinoDataReceived = true;
+						}
+						catch(NumberFormatException ex){
+							logger.warn("received sensor input data was not a number", ex);
+							arduinoDataReceived = false;
+						}
+						sleepThread.interrupt();
 					}
-					catch(NumberFormatException ex){
-						logger.warn("received sensor input data was not a number", ex);
-						arduinoDataReceived = false;
-					}
-					sleepThread.interrupt();
 				}
 			}
 			catch (IOException e) {

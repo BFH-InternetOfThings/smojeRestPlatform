@@ -64,7 +64,7 @@ public class Sensor implements SmojeSensor {
 	 */
 	@Override
 	public String getUnit() {
-		return this.unit;
+		return this.unit.trim();
 	}
 
 	/**
