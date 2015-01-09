@@ -166,49 +166,49 @@ void loop() {
 }
 
 int getIntForKey(String string){
-	if (strcmp(string.c_str(),"smoje.battery") == 0){
+	if (strcmp(string.c_str(),"smoje_battery") == 0){
 		return 0;
 	}
-	else if (strcmp(string.c_str(), "air.temperature") == 0){
+	else if (strcmp(string.c_str(), "air_temperature") == 0){
 		return 1;
 	}
-	else if (strcmp(string.c_str(), "air.humidity") == 0){
+	else if (strcmp(string.c_str(), "air_humidity") == 0){
 		return 2;
 	}
-	else if (strcmp(string.c_str(), "air.athmosphericpressure") == 0){
+	else if (strcmp(string.c_str(), "air_athmosphericpressure") == 0){
 		return 3;
 	}
-	else if (strcmp(string.c_str(), "air.geiger") == 0){
+	else if (strcmp(string.c_str(), "air_geiger") == 0){
 		return 4;
 	}
-	else if (strcmp(string.c_str(), "air.acceleration") == 0){
+	else if (strcmp(string.c_str(), "air_acceleration") == 0){
 		return 5;
 	}
-	else if (strcmp(string.c_str(), "air.windspeed") == 0){
+	else if (strcmp(string.c_str(), "air_windspeed") == 0){
 		return 6;
 	}
-	else if (strcmp(string.c_str(), "air.winddirection") == 0){
+	else if (strcmp(string.c_str(), "air_winddirection") == 0){
 		return 7;
 	}
-	else if (strcmp(string.c_str(), "air.rainamount") == 0){
+	else if (strcmp(string.c_str(), "air_rainamount") == 0){
 		return 8;
 	}
-	else if (strcmp(string.c_str(), "air.uvlight") == 0){
+	else if (strcmp(string.c_str(), "air_uvlight") == 0){
 		return 9;
 	}
-	else if (strcmp(string.c_str(), "air.compass") == 0){
+	else if (strcmp(string.c_str(), "air_compass") == 0){
 		return 10;
 	}	
-	else if (strcmp(string.c_str(), "water.temperature") == 0){
+	else if (strcmp(string.c_str(), "water_temperature") == 0){
 		return 11;
 	}
-	else if (strcmp(string.c_str(), "water.salinity") == 0){
+	else if (strcmp(string.c_str(), "water_salinity") == 0){
 		return 12;
 	}
-	else if (strcmp(string.c_str(), "water.dissolvedoxygen") == 0){
+	else if (strcmp(string.c_str(), "water_dissolvedoxygen") == 0){
 		return 13;
 	}
-	else if (strcmp(string.c_str(), "water.drift") == 0){
+	else if (strcmp(string.c_str(), "water_drift") == 0){
 		return 14;
 	}
         else
