@@ -101,7 +101,7 @@ public class ArduinoController implements SerialPortEventListener {
 	 * This will prevent port locking on platforms like Linux.
 	 */
 	public synchronized void close() {
-		logger.info("serial port has been closed");
+		logger.info("SERIAL: closing port");
 		if (serialPort != null) {
 			serialPort.removeEventListener();
 			serialPort.close();
@@ -125,11 +125,11 @@ public class ArduinoController implements SerialPortEventListener {
 		}
 		
 		try {
-			logger.info("Sending request to Arduino, ID: " + activeSensor.getId());
+			logger.info("RASPBERRY-->ARDUINO: " + activeSensor.getId());
 			output.write(activeSensor.getId().getBytes());
 			output.flush();
 		} catch (Exception e) {
-			logger.error("Could not write to serial port", e);
+			logger.error("ERROR: RASPBERRY-->ARDUINO: Could not write to serial port", e);
 			return false;
 		}
 		
@@ -166,26 +166,28 @@ public class ArduinoController implements SerialPortEventListener {
 			
 			try {
 				String serialData = input.readLine();
-				logger.info("received serial input is " + serialData);
+				logger.info("ARDUINO-->RASPBERRY " + serialData);
 
 				if (!activeSensor.getId().equals(serialData)) {
 					if(activeSensor != null){
-						logger.info("setting serial data on sensor");
+						
 						try{
 							activeSensor.setSensorValue(Double.valueOf(serialData));
 							arduinoDataReceived = true;
 						}
 						catch(NumberFormatException ex){
-							logger.warn("received sensor input data was not a number", ex);
+							logger.warn("ARDUINO data was not a number", ex);
 							arduinoDataReceived = false;
 						}
 						sleepThread.interrupt();
 					}
+					else{
+						logger.error("No active sensor (is null)");
+					}
 				}
 			}
 			catch (IOException e) {
-				e.printStackTrace();
-				//swallow
+				logger.error("Could not get Serial input", e);
 			}
 			break;
 		}
