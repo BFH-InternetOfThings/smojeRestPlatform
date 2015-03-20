@@ -172,7 +172,7 @@ public class ArduinoController implements SerialPortEventListener {
 					String serialData = input.readLine();
 					logger.info("SERIAL RECEIVED: " + serialData);
 
-					Pattern inputPattern = Pattern.compile("<ADUE: " + activeSensor.getId() + ": \\d+\\.*\\d*>");
+					Pattern inputPattern = Pattern.compile("<ADUE:" + activeSensor.getId() + ":\\d+\\.*\\d*>");
 					Matcher inputMatcher = inputPattern.matcher(serialData);
 
 					if(inputMatcher.matches()){ //check for full valid input
@@ -186,7 +186,7 @@ public class ArduinoController implements SerialPortEventListener {
 							logger.info("serial input is valid sensor data");
 							Double serialValue = Double.parseDouble(valueMatcher.group());
 
-							Pattern sensorPattern = Pattern.compile(": (.*?):");
+							Pattern sensorPattern = Pattern.compile(":(.*?):");
 							Matcher sensorMatcher = sensorPattern.matcher(serialData);
 
 							if (sensorMatcher.find()){ //check for sensor ID and set value if correct
