@@ -10,6 +10,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.util.Enumeration;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.logging.log4j.Logger;
 
@@ -22,29 +24,29 @@ import ch.bfh.iot.smoje.raspi.exceptions.ArduinoBusyException;
  * @author Matteo Morandi, Joel Holzer
  */
 public class ArduinoController implements SerialPortEventListener {
-	
+
 	private static final 	int 			PORT_TIME_OUT 			= 2000; // Milliseconds to block while waiting for port open
 	private static final 	int 			DATA_RATE 				= 9600; // Default bits per second for COM port
-    private final 			int				ARDUINO_TIME_OUT 		= 10000;
-    private 				Logger 			logger 					= Main.logger;
+	private final 			int				ARDUINO_TIME_OUT 		= 10000;
+	private 				Logger 			logger 					= Main.logger;
 	private 				SerialPort 		serialPort;
 	private 				BufferedReader 	input;	//Will be fed by an InputStreamReader, converting the bytes into characters making the displayed results codepage independent
 	private static 			OutputStream 	output; //Output stream to the port
-    private					boolean 		arduinoDataReceived 	= false;
-    private 				SmojeSensor		activeSensor;
-    private 				Thread 			sleepThread;
-	
+	private					boolean 		arduinoDataReceived 	= false;
+	private 				SmojeSensor		activeSensor;
+	private 				Thread 			sleepThread;
+
 	private static final String PORT_NAMES[] = { 
 		"/dev/ttyACM0", // Raspberry Pi
 	};
-	
-    /*
-     * Constructor
-     */
+
+	/*
+	 * Constructor
+	 */
 	public ArduinoController(){
 		initialize();
 	}
-	
+
 	/**
 	 * Tries to open serial connection and initializes for data transmission
 	 * Registers SerialPortEventListener
@@ -52,8 +54,8 @@ public class ArduinoController implements SerialPortEventListener {
 	public void initialize() {
 		logger.info("initializing ArduinoSensorConctroller");
 		// the next line is for Raspberry Pi and 
-        // gets us into the while loop and was suggested here was suggested http://www.raspberrypi.org/phpBB3/viewtopic.php?f=81&t=32186
-        System.setProperty("gnu.io.rxtx.SerialPorts", "/dev/ttyACM0");
+		// gets us into the while loop and was suggested here was suggested http://www.raspberrypi.org/phpBB3/viewtopic.php?f=81&t=32186
+		System.setProperty("gnu.io.rxtx.SerialPorts", "/dev/ttyACM0");
 
 		CommPortIdentifier portId = null;
 		Enumeration<?> portEnum = CommPortIdentifier.getPortIdentifiers();
@@ -83,19 +85,19 @@ public class ArduinoController implements SerialPortEventListener {
 					SerialPort.DATABITS_8,
 					SerialPort.STOPBITS_1,
 					SerialPort.PARITY_NONE
-			);
-		    
+					);
+
 			// open the streams
 			input = new BufferedReader(new InputStreamReader(serialPort.getInputStream()));
 			output = serialPort.getOutputStream();
 			serialPort.addEventListener(this);
 			serialPort.notifyOnDataAvailable(true);
-			
+
 		} catch (Exception e) {
 			logger.fatal("could not open serial port!", e);
 		}
 	}
-	
+
 	/**
 	 * This should be called when you stop using the port.
 	 * This will prevent port locking on platforms like Linux.
@@ -107,7 +109,7 @@ public class ArduinoController implements SerialPortEventListener {
 			serialPort.close();
 		}
 	}
-	
+
 	/**
 	 * Method tries to get value from Arduino and sets it on sensor given in parameter
 	 * @param requestedSensor
@@ -123,7 +125,7 @@ public class ArduinoController implements SerialPortEventListener {
 			logger.info("Sensor " + activeSensor.getSensorType().name() + " is now active. ID: " + activeSensor.getId());
 			arduinoDataReceived = false;
 		}
-		
+
 		try {
 			logger.info("RASPBERRY-->ARDUINO: " + activeSensor.getId());
 			output.write(activeSensor.getId().getBytes());
@@ -132,18 +134,18 @@ public class ArduinoController implements SerialPortEventListener {
 			logger.error("ERROR: RASPBERRY-->ARDUINO: Could not write to serial port", e);
 			return false;
 		}
-		
+
 		sleepThread = Thread.currentThread();
 		try {
 			Thread.sleep(ARDUINO_TIME_OUT);
 		} catch (InterruptedException e) {
 			logger.info("thread interrupted");
 		}
-		
+
 		activeSensor = null;
 		return arduinoDataReceived;
 	}
-	
+
 	/**
 	 * Handles serial port events, sets booleans and result
 	 */
@@ -163,28 +165,54 @@ public class ArduinoController implements SerialPortEventListener {
 		case SerialPortEvent.OUTPUT_BUFFER_EMPTY:
 			break;
 		case SerialPortEvent.DATA_AVAILABLE:
-			
-			try {
-				String serialData = input.readLine();
-				logger.info("ARDUINO-->RASPBERRY " + serialData);
 
-				if (!activeSensor.getId().equals(serialData)) {
-					if(activeSensor != null){
-						
-						try{
-							activeSensor.setSensorValue(Double.valueOf(serialData));
-							arduinoDataReceived = true;
+			if(activeSensor == null){
+				logger.error("active sensor is null");
+				break;
+			}
+
+			try { //get input string and parse to ensure correctness
+				String serialData = input.readLine();
+				logger.info("SERIAL RECEIVED: " + serialData);
+
+				Pattern inputPattern = Pattern.compile("<ADUE: " + activeSensor.getId() + ": \\d+\\.*\\d*>");
+				Matcher inputMatcher = inputPattern.matcher(serialData);
+				
+				if(inputMatcher.matches()){ //check for full valid input
+
+					logger.info("received data matches complete sensor value");
+					Pattern valuePattern = Pattern.compile("\\d+\\.*\\d*");
+					Matcher valueMatcher = valuePattern.matcher(serialData);
+
+					if (valueMatcher.find()){ //check for sensor value and extract it
+
+						logger.info("serial input is valid sensor data");
+						Double serialValue = Double.parseDouble(valueMatcher.group());
+
+						Pattern sensorPattern = Pattern.compile(": (.*?):");
+						Matcher sensorMatcher = sensorPattern.matcher(serialData);
+
+						if (sensorMatcher.find()){ //check for sensor ID and set value if correct
+
+							String receivedSensorId = sensorMatcher.group(1);
+							if(activeSensor.getId().equals(receivedSensorId)){
+
+								activeSensor.setSensorValue(serialValue);
+								arduinoDataReceived = true;
+							}else{
+								logger.error("received sensor is not requested");
+								arduinoDataReceived = false;
+							}
 						}
-						catch(NumberFormatException ex){
-							logger.warn("ARDUINO data was not a number", ex);
-							arduinoDataReceived = false;
-						}
-						sleepThread.interrupt();
+					}else{
+						logger.error("input did not contain valid number");
+						arduinoDataReceived = false;
 					}
-					else{
-						logger.error("No active sensor (is null)");
-					}
+				}else{
+					logger.error("received data was not sensor value or incomplete");
+					arduinoDataReceived = false;
 				}
+				sleepThread.interrupt();
 			}
 			catch (IOException e) {
 				logger.error("Could not get Serial input", e);
