@@ -166,56 +166,57 @@ public class ArduinoController implements SerialPortEventListener {
 			break;
 		case SerialPortEvent.DATA_AVAILABLE:
 
-			if(activeSensor == null){
-				logger.error("active sensor is null");
-				break;
-			}
+			if(activeSensor != null){
 
-			try { //get input string and parse to ensure correctness
-				String serialData = input.readLine();
-				logger.info("SERIAL RECEIVED: " + serialData);
+				try { //get input string and parse to ensure correctness
+					String serialData = input.readLine();
+					logger.info("SERIAL RECEIVED: " + serialData);
 
-				Pattern inputPattern = Pattern.compile("<ADUE: " + activeSensor.getId() + ": \\d+\\.*\\d*>");
-				Matcher inputMatcher = inputPattern.matcher(serialData);
-				
-				if(inputMatcher.matches()){ //check for full valid input
+					Pattern inputPattern = Pattern.compile("<ADUE: " + activeSensor.getId() + ": \\d+\\.*\\d*>");
+					Matcher inputMatcher = inputPattern.matcher(serialData);
 
-					logger.info("received data matches complete sensor value");
-					Pattern valuePattern = Pattern.compile("\\d+\\.*\\d*");
-					Matcher valueMatcher = valuePattern.matcher(serialData);
+					if(inputMatcher.matches()){ //check for full valid input
 
-					if (valueMatcher.find()){ //check for sensor value and extract it
+						logger.info("received data matches complete sensor value");
+						Pattern valuePattern = Pattern.compile("\\d+\\.*\\d*");
+						Matcher valueMatcher = valuePattern.matcher(serialData);
 
-						logger.info("serial input is valid sensor data");
-						Double serialValue = Double.parseDouble(valueMatcher.group());
+						if (valueMatcher.find()){ //check for sensor value and extract it
 
-						Pattern sensorPattern = Pattern.compile(": (.*?):");
-						Matcher sensorMatcher = sensorPattern.matcher(serialData);
+							logger.info("serial input is valid sensor data");
+							Double serialValue = Double.parseDouble(valueMatcher.group());
 
-						if (sensorMatcher.find()){ //check for sensor ID and set value if correct
+							Pattern sensorPattern = Pattern.compile(": (.*?):");
+							Matcher sensorMatcher = sensorPattern.matcher(serialData);
 
-							String receivedSensorId = sensorMatcher.group(1);
-							if(activeSensor.getId().equals(receivedSensorId)){
+							if (sensorMatcher.find()){ //check for sensor ID and set value if correct
 
-								activeSensor.setSensorValue(serialValue);
-								arduinoDataReceived = true;
-							}else{
-								logger.error("received sensor is not requested");
-								arduinoDataReceived = false;
+								String receivedSensorId = sensorMatcher.group(1);
+								if(activeSensor.getId().equals(receivedSensorId)){
+
+									activeSensor.setSensorValue(serialValue);
+									arduinoDataReceived = true;
+								}else{
+									logger.error("received sensor is not requested");
+									arduinoDataReceived = false;
+								}
 							}
+						}else{
+							logger.error("input did not contain valid number");
+							arduinoDataReceived = false;
 						}
 					}else{
-						logger.error("input did not contain valid number");
+						logger.error("received data was not sensor value or incomplete");
 						arduinoDataReceived = false;
 					}
-				}else{
-					logger.error("received data was not sensor value or incomplete");
-					arduinoDataReceived = false;
+					sleepThread.interrupt();
 				}
-				sleepThread.interrupt();
-			}
-			catch (IOException e) {
-				logger.error("Could not get Serial input", e);
+				catch (IOException e) {
+					logger.error("Could not get Serial input", e);
+				}
+			}else{
+				logger.info("active sensor is null");
+				arduinoDataReceived = false;
 			}
 			break;
 		}
