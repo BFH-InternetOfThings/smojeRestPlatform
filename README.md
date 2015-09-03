@@ -1,12 +1,11 @@
 smojeRestPlatform
 =================
 
+***Important: this fork of barta3s original repo contains changes made for the SelfieSmoje!***
+
+
 Build/Install
 --------------
-
-
-
-
 
 mvn clean package
 
