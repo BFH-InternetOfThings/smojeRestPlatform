@@ -14,8 +14,8 @@ public class RaspiCamera implements SmojeSensor {
 	private final String destDir = "/home/pi/smoje/cam/";
 	private final String imgName = "temp.jpg";
 	
-//modified for SelfieSmoje
-	private final String imgCaptureInstr = "fswebcam -r 1920x1080 --no-banner " + destDir+ imgName + "";
+    //modified for Logitech Cam on the SelfieSmoje
+	private final String imgCaptureInstr = "fswebcam -r 1280x720 --no-banner " + destDir+ imgName + "";
 	
     @Override
     public String getId() {
