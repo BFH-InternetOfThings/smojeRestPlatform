@@ -20,7 +20,8 @@ public enum SensorType {
 	RAIN_AMOUNT ("air.rainamount"),
 	UV_LIGHT ("air.uvlight"),
 	COMPASS ("air.compass"),
-	WATER_TEMPERATURE ("water.temperature");
+	WATER_TEMPERATURE ("water.temperature"),
+	BATTERY_VOLTAGE("smoje.battery");
 	
     private final String key;
 	
